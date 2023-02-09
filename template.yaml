@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Example CRUD App
+Description: Proof of concept for Spring Boot REST API + CRUD PostgreSQL in AWS Lambda
 
 Globals:
   Api:
@@ -25,6 +25,13 @@ Resources:
           Properties:
             TimeoutInMillis: 20000
             PayloadFormatVersion: '1.0'
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-06b1270b60ade5add
+        SubnetIds:
+          - subnet-03f06faa6a76dfed6
+          - subnet-07c0faeda54f57ec8
+          - subnet-021d7187432bec909
 
 Outputs:
   SubscribersApi:
