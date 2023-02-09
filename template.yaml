@@ -27,8 +27,8 @@ Resources:
             PayloadFormatVersion: '1.0'
 
 Outputs:
-  SpringBootPetStoreApi:
+  SubscribersApi:
     Description: URL for application
     Value: !Sub 'https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/subscribers'
     Export:
-      Name: SpringBootPetStoreApi
+      Name: SubscribersApi
