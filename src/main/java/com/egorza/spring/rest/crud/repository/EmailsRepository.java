@@ -1,0 +1,13 @@
+package com.egorza.spring.rest.crud.repository;
+
+import com.egorza.spring.rest.crud.model.Email;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+import java.util.UUID;
+
+public interface EmailsRepository extends JpaRepository<Email, Integer> {
+  Optional<Email> findByEmail(String email);
+
+  Optional<Email> findById(UUID id);
+}
