@@ -11,6 +11,7 @@ import software.amazon.awssdk.services.ses.model.*;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
+import javax.transaction.Transactional;
 import java.util.Base64;
 
 
@@ -23,20 +24,23 @@ public class EmailsService {
     @Value("${ENCRYPT_KEY}")
     private String key;
 
-    public Email encryptAndSave(Email email) {
+    @Transactional
+    public Email encryptAndSaveOrDelete(Email email, Boolean delete) {
         try {
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "AES");
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
             email.setEmail(Base64.getEncoder().encodeToString(cipher.doFinal(email.getEmail().getBytes())));
         } catch (Exception e) {
-            // Handle exceptions
+            e.printStackTrace();
         }
-        if (emailsRepository.findByEmail(email.getEmail()).isEmpty()) {
+        if (delete) {
+            emailsRepository.deleteByEmail(email.getEmail());
+        } else if (emailsRepository.findByEmail(email.getEmail()).isEmpty()) {
             emailsRepository.save(email);
+            sendNotificationEmail(decryptEmail(email).getEmail());
         }
-        sendNotificationEmail(email.getEmail());
-        return email;
+        return decryptEmail(email);
     }
 
     public Email decryptEmail(Email email) {
@@ -46,7 +50,7 @@ public class EmailsService {
             cipher.init(Cipher.DECRYPT_MODE, secretKey);
             email.setEmail(new String(cipher.doFinal(Base64.getDecoder().decode(email.getEmail()))));
         } catch (Exception e) {
-            // Handle exceptions
+            e.printStackTrace();
         }
         return email;
     }

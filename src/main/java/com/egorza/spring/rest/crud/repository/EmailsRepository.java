@@ -10,4 +10,6 @@ public interface EmailsRepository extends JpaRepository<Email, Integer> {
   Optional<Email> findByEmail(String email);
 
   Optional<Email> findById(UUID id);
+
+  void deleteByEmail(String email);
 }

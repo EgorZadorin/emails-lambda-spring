@@ -77,7 +77,7 @@ public class EmailsController {
 	}
 
 	private String maskEmail(String email) {
-		return email.replaceAll("(?<=.{2}).(?=[^@]*?@)", "*");
+		return email.replaceAll("(?<=.).(?=[^@]*?@)", "*");
 	}
 
 	@GetMapping("/subscribers-amount")
@@ -89,8 +89,8 @@ public class EmailsController {
 	public ResponseEntity<EmailDto> postEmail(@RequestBody EmailDto emailDto) {
 		try {
 			Email email = new Email(emailDto);
-			Email _email = emailsService.encryptAndSave(email);
-			return new ResponseEntity<>(_email.toDto(), HttpStatus.CREATED);
+			Email _email = emailsService.encryptAndSaveOrDelete(email, false);
+			return new ResponseEntity<>(new EmailDto(maskEmail(_email.getEmail())), HttpStatus.CREATED);
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -111,11 +111,24 @@ public class EmailsController {
 	}
 
 	@DeleteMapping("/subscribers/{id}")
-	public ResponseEntity<HttpStatus> deleteEmail(@PathVariable("id") Integer id) {
+	public ResponseEntity<HttpStatus> deleteEmailById(@PathVariable("id") Integer id) {
 		try {
 			emailsRepository.deleteById(id);
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@DeleteMapping("/subscribers/email/{email}")
+	public ResponseEntity<HttpStatus> deleteEmailByName(@PathVariable String email) {
+		try {
+
+			Email _email = new Email(new EmailDto(email));
+			emailsService.encryptAndSaveOrDelete(_email, true);
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
