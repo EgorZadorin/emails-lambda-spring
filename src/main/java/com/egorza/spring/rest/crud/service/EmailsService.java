@@ -4,22 +4,21 @@ import com.egorza.spring.rest.crud.model.Email;
 import com.egorza.spring.rest.crud.repository.EmailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.ses.SesClient;
+import software.amazon.awssdk.services.ses.model.*;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
+
 
 @Service
 public class EmailsService {
 
     @Autowired
     EmailsRepository emailsRepository;
-
-    @Autowired
-    private JavaMailSender mailSender;
 
     @Value("${ENCRYPT_KEY}")
     private String key;
@@ -53,11 +52,24 @@ public class EmailsService {
     }
 
     public void sendNotificationEmail(String newContactEmail) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo("egorzadorin04@gmail.com");
-        message.setSubject("New Contact: " + newContactEmail);
-        message.setText("Someone wants to contact you. Their email is " + newContactEmail);
+        SesClient ses = SesClient.builder()
+                .region(Region.EU_CENTRAL_1)
+                .build();
 
-        mailSender.send(message);
+        SendEmailRequest request = SendEmailRequest.builder()
+                .source("emails.zadorin@gmail.com")
+                .destination(Destination.builder()
+                        .toAddresses("egorzadorin04@gmail.com")
+                        .build())
+                .message(Message.builder()
+                        .subject(Content.builder().data("New Contact Email").charset("UTF-8").build())
+                        .body(Body.builder()
+                                .text(Content.builder().data("The person with the following email:\n" +
+                                        newContactEmail + "\nwants to contact you!").charset("UTF-8").build())
+                                .build())
+                        .build())
+                .build();
+
+        ses.sendEmail(request);
     }
 }
