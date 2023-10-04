@@ -1,6 +1,6 @@
-package com.egorza.spring.rest.crud.model;
+package spring.rest.crud.model;
 
-import com.egorza.spring.rest.crud.dto.EmailDto;
+import spring.rest.crud.dto.EmailDto;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

@@ -1,7 +1,8 @@
-package com.egorza.spring.rest.crud.service;
+package spring.rest.crud.service;
 
-import com.egorza.spring.rest.crud.model.Email;
-import com.egorza.spring.rest.crud.repository.EmailsRepository;
+import spring.rest.crud.exceptions.NotFoundException;
+import spring.rest.crud.model.Email;
+import spring.rest.crud.repository.EmailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,8 +25,14 @@ public class EmailsService {
     @Value("${ENCRYPT_KEY}")
     private String key;
 
+    @Value("${EMAIL_SENDER}")
+    private String emailSender;
+
+    @Value("${MY_EMAIL}")
+    private String myEmail;
+
     @Transactional
-    public Email encryptAndSaveOrDelete(Email email, Boolean delete) {
+    public Email encryptAndSaveOrDelete(Email email, Boolean delete) throws NotFoundException {
         try {
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "AES");
@@ -61,9 +68,9 @@ public class EmailsService {
                 .build();
 
         SendEmailRequest request = SendEmailRequest.builder()
-                .source("emails.zadorin@gmail.com")
+                .source(emailSender)
                 .destination(Destination.builder()
-                        .toAddresses("egorzadorin04@gmail.com")
+                        .toAddresses(myEmail)
                         .build())
                 .message(Message.builder()
                         .subject(Content.builder().data("New Contact Email").charset("UTF-8").build())

@@ -1,4 +1,4 @@
-package com.egorza.spring.rest.crud;
+package spring.rest.crud;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

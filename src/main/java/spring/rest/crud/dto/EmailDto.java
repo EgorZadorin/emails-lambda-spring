@@ -1,4 +1,4 @@
-package com.egorza.spring.rest.crud.dto;
+package spring.rest.crud.dto;
 
 public class EmailDto {
     private String email;

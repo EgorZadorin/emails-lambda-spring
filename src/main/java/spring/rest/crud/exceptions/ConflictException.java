@@ -1,4 +1,4 @@
-package com.egorza.spring.rest.crud.exceptions;
+package spring.rest.crud.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

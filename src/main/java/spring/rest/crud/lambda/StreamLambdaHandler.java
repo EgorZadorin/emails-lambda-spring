@@ -1,4 +1,4 @@
-package com.egorza.spring.rest.crud.lambda;
+package spring.rest.crud.lambda;
 
 import com.amazonaws.serverless.exceptions.ContainerInitializationException;
 import com.amazonaws.serverless.proxy.model.AwsProxyRequest;
@@ -7,7 +7,7 @@ import com.amazonaws.serverless.proxy.spring.SpringBootLambdaContainerHandler;
 import com.amazonaws.serverless.proxy.spring.SpringBootProxyHandlerBuilder;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
-import com.egorza.spring.rest.crud.SpringBootJpaPostgresqlApplication;
+import spring.rest.crud.SpringBootJpaPostgresqlApplication;
 
 import java.io.IOException;
 import java.io.InputStream;
