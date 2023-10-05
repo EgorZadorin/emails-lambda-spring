@@ -1,15 +1,15 @@
-package com.egorza.spring.rest.crud.controller;
+package spring.rest.crud.controller;
 
-import com.egorza.spring.rest.crud.dto.EmailDto;
-import com.egorza.spring.rest.crud.model.Email;
-import com.egorza.spring.rest.crud.repository.EmailsRepository;
-import com.egorza.spring.rest.crud.service.EmailsService;
+import spring.rest.crud.dto.EmailDto;
+import spring.rest.crud.exceptions.NotFoundException;
+import spring.rest.crud.model.Email;
+import spring.rest.crud.repository.EmailsRepository;
+import spring.rest.crud.service.EmailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,7 +25,7 @@ public class EmailsController {
 	@Autowired
 	EmailsService emailsService;
 
-	@GetMapping("/subscribers")
+/*	@GetMapping("/subscribers")
 	public ResponseEntity<List<EmailDto>> getAllEmails() {
 		try {
 			List<Email> emails = new ArrayList<>(emailsRepository.findAll());
@@ -42,7 +42,7 @@ public class EmailsController {
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-	}
+	}*/
 
 	@GetMapping("/subscribers/{id}")
 	public ResponseEntity<EmailDto> getEmailById(@PathVariable("id") UUID id) {
@@ -121,9 +121,8 @@ public class EmailsController {
 	}
 
 	@DeleteMapping("/subscribers/email/{email}")
-	public ResponseEntity<HttpStatus> deleteEmailByName(@PathVariable String email) {
+	public ResponseEntity<HttpStatus> deleteEmailByName(@PathVariable String email) throws NotFoundException {
 		try {
-
 			Email _email = new Email(new EmailDto(email));
 			emailsService.encryptAndSaveOrDelete(_email, true);
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -133,7 +132,7 @@ public class EmailsController {
 		}
 	}
 
-	@DeleteMapping("/subscribers")
+/*	@DeleteMapping("/subscribers")
 	public ResponseEntity<HttpStatus> deleteAllEmails() {
 		try {
 			emailsRepository.deleteAll();
@@ -141,7 +140,6 @@ public class EmailsController {
 		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
-	}
+	}*/
 
 }
