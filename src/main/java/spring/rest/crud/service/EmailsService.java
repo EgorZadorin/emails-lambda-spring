@@ -1,14 +1,15 @@
 package spring.rest.crud.service;
 
-import spring.rest.crud.exceptions.NotFoundException;
-import spring.rest.crud.model.Email;
-import spring.rest.crud.repository.EmailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ses.SesClient;
 import software.amazon.awssdk.services.ses.model.*;
+import spring.rest.crud.exceptions.ConflictException;
+import spring.rest.crud.exceptions.NotFoundException;
+import spring.rest.crud.model.Email;
+import spring.rest.crud.repository.EmailsRepository;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -32,7 +33,7 @@ public class EmailsService {
     private String myEmail;
 
     @Transactional
-    public Email encryptAndSaveOrDelete(Email email, Boolean delete) throws NotFoundException {
+    public Email encryptAndSaveOrDelete(Email email, Boolean delete) throws NotFoundException, ConflictException {
         try {
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "AES");
@@ -42,8 +43,14 @@ public class EmailsService {
             e.printStackTrace();
         }
         if (delete) {
+            if(emailsRepository.findByEmail(email.getEmail()).isEmpty()) {
+                throw new NotFoundException("Email not found for deletion");
+            }
             emailsRepository.deleteByEmail(email.getEmail());
-        } else if (emailsRepository.findByEmail(email.getEmail()).isEmpty()) {
+        } else {
+            if (emailsRepository.findByEmail(email.getEmail()).isPresent()) {
+                throw new ConflictException("Email already exists");
+            }
             emailsRepository.save(email);
             sendNotificationEmail(decryptEmail(email).getEmail());
         }

@@ -1,14 +1,15 @@
 package spring.rest.crud.controller;
 
-import spring.rest.crud.dto.EmailDto;
-import spring.rest.crud.exceptions.NotFoundException;
-import spring.rest.crud.model.Email;
-import spring.rest.crud.repository.EmailsRepository;
-import spring.rest.crud.service.EmailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import spring.rest.crud.dto.EmailDto;
+import spring.rest.crud.exceptions.ConflictException;
+import spring.rest.crud.exceptions.NotFoundException;
+import spring.rest.crud.model.Email;
+import spring.rest.crud.repository.EmailsRepository;
+import spring.rest.crud.service.EmailsService;
 
 import java.util.List;
 import java.util.Optional;
@@ -91,6 +92,8 @@ public class EmailsController {
 			Email email = new Email(emailDto);
 			Email _email = emailsService.encryptAndSaveOrDelete(email, false);
 			return new ResponseEntity<>(new EmailDto(maskEmail(_email.getEmail())), HttpStatus.CREATED);
+		} catch (ConflictException e) {
+			return new ResponseEntity<>(HttpStatus.CONFLICT);
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -126,6 +129,8 @@ public class EmailsController {
 			Email _email = new Email(new EmailDto(email));
 			emailsService.encryptAndSaveOrDelete(_email, true);
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		} catch (NotFoundException e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
