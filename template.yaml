@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Proof of concept for Spring Boot REST API + CRUD PostgreSQL in AWS Lambda
+
+Globals:
+  Api:
+    # API Gateway regional endpoints
+    EndpointConfiguration: REGIONAL
+
+Resources:
+  SubscribersFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: spring.rest.crud.lambda.StreamLambdaHandler::handleRequest
+      Runtime: java11
+      CodeUri: .
+      MemorySize: 1512
+      Policies:
+        - AmazonSESFullAccess
+        - AWSLambdaBasicExecutionRole
+      Timeout: 60
+      SnapStart:
+        ApplyOn: PublishedVersions
+      Events:
+        HttpApiEvent:
+          Type: HttpApi
+          Properties:
+            TimeoutInMillis: 60000
+            PayloadFormatVersion: '1.0'
+
+      Environment:
+        Variables:
+          ENCRYPT_KEY: "ENCRYPT_KEY"
+          DB_HOST: "0.0.0.0"
+          DB_PORT: "0000"
+          DB_NAME: "DB_NAME"
+          DB_USERNAME: "DB_USERNAME"
+          DB_PASSWORD: "DB_PASSWORD"
+          EMAIL_SENDER: "sender@example.com"
+          MY_EMAIL: "myemail@example.com"
+
+Outputs:
+  SubscribersApi:
+    Description: URL for application
+    Value: !Sub 'https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/subscribers'
+    Export:
+      Name: SubscribersApi

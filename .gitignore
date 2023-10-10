@@ -33,7 +33,6 @@ build/
 .vscode/
 
 ### AWS SAM ###
-template.yaml
 *.toml
 
 ### dev testing ###
