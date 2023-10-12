@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import spring.rest.crud.dto.EmailContent;
 import spring.rest.crud.dto.EmailDto;
 import spring.rest.crud.exceptions.ConflictException;
 import spring.rest.crud.exceptions.NotFoundException;
@@ -87,10 +88,10 @@ public class EmailsController {
 	}
 
 	@PostMapping("/subscribers")
-	public ResponseEntity<EmailDto> postEmail(@RequestBody EmailDto emailDto) {
+	public ResponseEntity<EmailDto> postEmail(@RequestBody EmailContent emailContent) {
 		try {
-			Email email = new Email(emailDto);
-			Email _email = emailsService.encryptAndSaveOrDelete(email, false);
+			Email email = new Email(emailContent.getEmailDto());
+			Email _email = emailsService.encryptAndSaveOrDelete(email, emailContent.getMessage(), false);
 			return new ResponseEntity<>(new EmailDto(maskEmail(_email.getEmail())), HttpStatus.CREATED);
 		} catch (ConflictException e) {
 			return new ResponseEntity<>(HttpStatus.CONFLICT);
@@ -127,7 +128,7 @@ public class EmailsController {
 	public ResponseEntity<HttpStatus> deleteEmailByName(@PathVariable String email) throws NotFoundException {
 		try {
 			Email _email = new Email(new EmailDto(email));
-			emailsService.encryptAndSaveOrDelete(_email, true);
+			emailsService.encryptAndSaveOrDelete(_email, "", true);
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		} catch (NotFoundException e) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);

@@ -33,7 +33,7 @@ public class EmailsService {
     private String myEmail;
 
     @Transactional
-    public Email encryptAndSaveOrDelete(Email email, Boolean delete) throws NotFoundException, ConflictException {
+    public Email encryptAndSaveOrDelete(Email email, String message, Boolean delete) throws NotFoundException, ConflictException {
         try {
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "AES");
@@ -52,7 +52,7 @@ public class EmailsService {
                 throw new ConflictException("Email already exists");
             }
             emailsRepository.save(email);
-            sendNotificationEmail(decryptEmail(email).getEmail());
+            sendNotificationEmail(decryptEmail(email).getEmail(), message);
         }
         return decryptEmail(email);
     }
@@ -69,7 +69,7 @@ public class EmailsService {
         return email;
     }
 
-    public void sendNotificationEmail(String newContactEmail) {
+    public void sendNotificationEmail(String newContactEmail, String message) {
         SesClient ses = SesClient.builder()
                 .region(Region.EU_CENTRAL_1)
                 .build();
@@ -83,10 +83,12 @@ public class EmailsService {
                         .subject(Content.builder().data("New Contact Email").charset("UTF-8").build())
                         .body(Body.builder()
                                 .text(Content.builder().data("The person with the following email:\n" +
-                                        newContactEmail + "\nwants to contact you!").charset("UTF-8").build())
+                                        newContactEmail + "\nwants to contact you! He has sent the following message:\n" +
+                                        message).charset("UTF-8").build())
                                 .build())
                         .build())
                 .build();
+
 
         ses.sendEmail(request);
     }
