@@ -20,8 +20,11 @@ import java.util.Base64;
 @Service
 public class EmailsService {
 
-    @Autowired
-    EmailsRepository emailsRepository;
+    private final EmailsRepository emailsRepository;
+
+    EmailsService(EmailsRepository emailsRepository) {
+        this.emailsRepository = emailsRepository;
+    }
 
     @Value("${ENCRYPT_KEY}")
     private String key;
